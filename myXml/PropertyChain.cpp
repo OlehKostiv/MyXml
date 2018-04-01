@@ -84,7 +84,7 @@ MyXml::Property::Property(const Char* propName, Int propValue)
 }
 MyXml::Property::~Property()
 {
-    Log.InRed("~Property();: ", " ").InRed(name, ", ").InRed(text);
+    //Log.InRed("~Property();: ", " ").InRed(name, ", ").InRed(text);
     delete[] name;
     delete[] text;
 }
@@ -93,7 +93,7 @@ MyXml::Char* MyXml::Property::ToPChar() const
 {
     Char buff[128];
 
-    sprintf(buff, "%s = \"%s\"", name, text);
+    std::sprintf(buff, "%s = \"%s\"", name, text);
 
     return AllocateCopyOf(buff);
 }

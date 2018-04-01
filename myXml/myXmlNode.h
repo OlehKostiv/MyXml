@@ -8,6 +8,8 @@ namespace MyXml
 	public:
         using Iter = Node * ;
 
+        Node(const Char* nodeName);
+        Node(const Char* nodeName, PropertyChain& nodeProperties);
 		Node(const Char* nodeName, const Char* nodeText);
         Node(const Char* nodeName, const Char* nodeText, PropertyChain& nodeProperties);
 		virtual ~Node();
@@ -15,7 +17,7 @@ namespace MyXml
         Node& AppendChild(Node*);
         Node& AppendSibling(Node*);
         
-        Char* ToPchar() const;
+        virtual Char* ToPChar() const;
 	protected:
 		Node();
 		PNode firstChild;
@@ -30,6 +32,18 @@ namespace MyXml
     class Element:
         public Node
     {
+    public:
+        Element(const Char* elementName, const Char* elementText);
+        Element(const Char* elementName, const Char* elementText, PropertyChain& elementProperties);
+       ~Element();
 
+    };
+
+    class Comment:
+        public Node
+    {
+    public:
+        Comment(const Char* commentText);
+       ~Comment();
     };
 }

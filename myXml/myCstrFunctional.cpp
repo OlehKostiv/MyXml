@@ -5,18 +5,19 @@
 
 MyXml::Char* MyXml::AllocateCopyOf(const Char* source)
 {
+    Char* result{};
     assert(source != nullptr);
-
-    Char* result = nullptr;
-    if (source)
     {
-        size_t size = std::strlen(source) + 1;
-        if (result = new Char[size])
+        if (source)
         {
-            std::strcpy(result, source);
+            size_t size = std::strlen(source) + 1;
+            if (result = new Char[size])
+            {
+                std::strcpy(result, source);
+            }
         }
     }
-    return result;
+    return result;  
 }
 
 MyXml::Char* MyXml::AllocateACatOf(const Char* next, const Char* second)

@@ -1,5 +1,6 @@
 #include "Logger.h"
 #include "myXmlNode.h"
+#include "myCstrFUnctional.h"
 
 #include <cstring>
 #include <cassert>
@@ -21,33 +22,25 @@ MyXml::Node::Node() :
 {
 	Log.InRed("Node();");
 }
-
-MyXml::Node::Node(const Char* nodeName, const Char* nodeText):
-	Node()
+MyXml::Node::Node(const Char * nodeName)
 {
-	if (nodeName)
-	{
-		size_t nameLength = std::strlen(nodeName);
-		name = new Char[nameLength + 1];
-		std::strcpy(name, nodeName);
-	}
-
-	if (nodeText)
-	{
-		size_t textLength = std::strlen(nodeText);
-		text = new Char[textLength + 1];
-		std::strcpy(text, nodeText);
-	}
-
-	Log.InRed("Node(...)");
+    name = AllocateCopyOf(nodeName);
 }
-
+MyXml::Node::Node(const Char* nodeName, const Char* nodeText):
+    Node(nodeName)
+{
+    text = AllocateCopyOf(nodeText);
+}
+MyXml::Node::Node(const Char* nodeName, PropertyChain& nodeProperties):
+    Node(nodeName)
+{
+    properties = static_cast<PropertyChain&&>(nodeProperties);
+}
 MyXml::Node::Node(const Char * nodeName, const Char * nodeText, PropertyChain& nodeProperties):
     Node(nodeName, nodeText)
 {
     properties = static_cast<PropertyChain&&>(nodeProperties);
 }
-
 MyXml::Node::~Node()
 {
 	if (name)
@@ -57,6 +50,7 @@ MyXml::Node::~Node()
 
     Log.InRed("~Node();");
 }
+
 MyXml::Node& MyXml::Node::AppendChild(Node* newChild)
 {
     assert(newChild != nullptr);
@@ -75,18 +69,56 @@ MyXml::Node& MyXml::Node::AppendSibling(Node* newSibling)
 
     return *this;
 }
-
-MyXml::Char * MyXml::Node::ToPchar() const
+MyXml::Char* MyXml::Node::ToPChar() const
 {
-    Char buff[1024]{ 0 };
-    /*
-    if (firstChild == nullptr)
+    Char buff[1024] = "";
+    
+    Char* props = properties.ToPChar();
+    std::sprintf(buff, "<%s %s", name, props);
+    delete[] props;
+
+    if (firstChild || text)
     {
-        std::sprintf(buff, "<%s", name);
-        for (Property::Iter pi = properties.firstProperty)
+        std::strcat(buff, ">");
+        
+        if (firstChild)
+        {
+            std::strcat(buff, "%s");            
+        }
+        if (text)
+        {
+            std::strcat(buff, text);
+        }
+
+        Char* buffCat = buff;
+        while (*++buffCat);
+        std::sprintf(buffCat, "</%s>", name);
     }
+    else
+    {
+        std::strcat(buff, " />");
+    }
+    return AllocateCopyOf(buff);
+}
 
-    sprintf("<%s>", )*/
+MyXml::Element::Element(const Char * elementName, const Char * elementText):
+    Node(elementName, elementText)
+{}
+MyXml::Element::Element(const Char * elementName, const Char * elementText, PropertyChain & elementProperties):
+    Node(elementName, elementText, elementProperties)
+{}
+MyXml::Element::~Element()
+{
+    Log.InRed("~Element();");
+}
 
-    return nullptr;
+MyXml::Comment::Comment(const Char * commentText):
+    Node()
+{
+    text = AllocateCopyOf(commentText);
+}
+
+MyXml::Comment::~Comment()
+{
+    Log.InRed("~Comment();");
 }

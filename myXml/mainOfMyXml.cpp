@@ -104,7 +104,7 @@ int main()
     //TestAllocateACatOf();
     //TestDoubleToPchar();
     //TestPropertyToPchar();
-    TestPropertyChain();
+    //TestPropertyChain();
 
     return system("pause");
 }
