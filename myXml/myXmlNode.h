@@ -14,7 +14,6 @@ namespace MyXml
         Node(const Char* nodeName, PropertyChain& nodeProperties);
 		Node(const Char* nodeName, const Char* nodeText);
         Node(const Char* nodeName, const Char* nodeText, PropertyChain& nodeProperties);
-        //Node(Node&);
 		virtual ~Node();
 
         Node::Iter AppendChild(Node::Iter);
@@ -37,15 +36,12 @@ namespace MyXml
             return AppendProperty(p)->AppendProperty(args...);
         }
 
-        Node::Iter FirstChild() const;
-        Node::Iter NextSibling() const;
+        Node::Iter FirstChild()   const;
+        Node::Iter NextSibling()  const;
 
         virtual Char* ToCharStr() const;
 
         Node::Iter operator->();
-       /* void* operator new(size_t size) {
-            return ::new Node();
-        }*/
 	protected:
 		Node();
 		Node::Iter firstChild;
@@ -77,5 +73,9 @@ namespace MyXml
         Comment(const Char* commentText);
        ~Comment();
        virtual Char* ToCharStr() const override;
+    private:
+        using Element::AppendChild;
+        using Element::AppendProperty;
+        using Element::FirstChild;
     };
 }

@@ -38,7 +38,7 @@ MyXml::Char* MyXml::AllocateACatOf(const Char* next, const Char* second)
 
 MyXml::Char* MyXml::IntToCharStr(Int value)
 {
-    Char* result;
+    Char* result{};
     if (value)
     {
         Bool isNegative = value < 0 ? true : false;

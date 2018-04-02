@@ -159,6 +159,9 @@ void TestNode()
         )
     );
 
+    Comment c("this is comment");
+    //c.AppendChild(new Element("asd"));
+
         //->AppendProperty(new Property("exp_prop", "exp_prop_value"))
         //
         //->AppendChild(

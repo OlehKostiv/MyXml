@@ -6,6 +6,7 @@
 #include <cassert>
 #include <iostream>
 
+
 #ifdef _DEBUG
 static Logger Log(std::cout);
 #else 
@@ -85,7 +86,7 @@ MyXml::Node::Iter MyXml::Node::FirstChild() const
 }
 MyXml::Node::Iter MyXml::Node::NextSibling() const
 {
-    return (nextSister);
+    return nextSister;
 }
 MyXml::Char* MyXml::Node::ToCharStr() const
 {
