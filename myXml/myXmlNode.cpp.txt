@@ -1,4 +1,3 @@
-Node();
 ~Element(): el1
 ~Node();
 ~Comment();this is my comment

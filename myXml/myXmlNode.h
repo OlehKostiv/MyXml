@@ -7,7 +7,7 @@ namespace MyXml
 	{
 	public:
         using Iter = Node * ;
-        using ConstIter = const Node*;
+        using ConstIter = const Node::Iter;
         using SuperConstIter = const Node const * const;
 
         Node(const Char* nodeName);
@@ -17,39 +17,39 @@ namespace MyXml
         //Node(Node&);
 		virtual ~Node();
 
-        Node* AppendChild(Node*);
-        Node* AppendSibling(Node*);
-        Node* AppendProperty(Property*);
+        Node::Iter AppendChild(Node::Iter);
+        Node::Iter AppendSibling(Node::Iter);
+        Node::Iter AppendProperty(Property*);
 
         template<class...Args>
-        Node* AppendChild(Node* p, Args...args)
+        Node::Iter AppendChild(Node::Iter p, Args...args)
         {
             return AppendChild(p)->AppendChild(args...);
         }
         template<class...Args>
-        Node* AppendSibling(Node* p, Args...args)
+        Node::Iter AppendSibling(Node::Iter p, Args...args)
         {
             return AppendSibling(p)->AppendSibling(args...);
         }
         template<class...Args>
-        Node* AppendProperty(Property* p, Args...args)
+        Node::Iter AppendProperty(Property* p, Args...args)
         {
             return AppendProperty(p)->AppendProperty(args...);
         }
 
-        Node* FirstChild() const;
-        Node* NextSibling() const;
+        Node::Iter FirstChild() const;
+        Node::Iter NextSibling() const;
 
         virtual Char* ToCharStr() const;
 
-        Node* operator->();
+        Node::Iter operator->();
        /* void* operator new(size_t size) {
             return ::new Node();
         }*/
 	protected:
 		Node();
-		Node* firstChild;
-		Node* nextSister;
+		Node::Iter firstChild;
+		Node::Iter nextSister;
 
 		Char* name;
 		Char* text;

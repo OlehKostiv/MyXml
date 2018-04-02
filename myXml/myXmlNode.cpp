@@ -10,14 +10,11 @@
 static Logger Log(std::cout);
 #else 
 #include <fstream>
-static char* fp = __FILE__;
-static char* filePath = MyXml::AllocateACatOf(fp, ".txt");
+static char* filePath = MyXml::AllocateACatOf((char*)__FILE__, ".txt");
 static std::ofstream logFile(filePath, std::ios::out);
 static Logger Log(logFile);
 static int freeFP = []() { delete[] filePath; return 0;}();
 #endif
-
-
 
 MyXml::Node::Node() :
 	nextSister		(nullptr),
@@ -54,7 +51,7 @@ MyXml::Node::~Node()
 		delete[] text;
 }
 
-MyXml::Node* MyXml::Node::AppendChild(Node* newChild)
+MyXml::Node::Iter MyXml::Node::AppendChild(Node::Iter newChild)
 {
     //std::cout << this << " " << this->name << " ap c " << newChild->name << std::endl;  
     if(!newChild->nextSister)
@@ -66,7 +63,7 @@ MyXml::Node* MyXml::Node::AppendChild(Node* newChild)
 
     return &(*this);
 }
-MyXml::Node* MyXml::Node::AppendSibling(Node* newSibling)
+MyXml::Node::Iter MyXml::Node::AppendSibling(Node::Iter newSibling)
 {
     //std::cout << this << " " << this->name << " ap s " << newSibling->name << std::endl;
     if (!this->nextSister)
@@ -77,16 +74,16 @@ MyXml::Node* MyXml::Node::AppendSibling(Node* newSibling)
     }
     return &(*this);
 }
-MyXml::Node* MyXml::Node::AppendProperty(Property* newProperty)
+MyXml::Node::Iter MyXml::Node::AppendProperty(Property* newProperty)
 {
     properties.Append(newProperty);
     return this;
 }
-MyXml::Node* MyXml::Node::FirstChild() const
+MyXml::Node::Iter MyXml::Node::FirstChild() const
 {
     return firstChild;
 }
-MyXml::Node* MyXml::Node::NextSibling() const
+MyXml::Node::Iter MyXml::Node::NextSibling() const
 {
     return (nextSister);
 }
@@ -129,7 +126,7 @@ MyXml::Char* MyXml::Node::ToCharStr() const
     }
     return AllocateCopyOf(buff);
 }
-MyXml::Node* MyXml::Node::operator->()
+MyXml::Node::Iter MyXml::Node::operator->()
 {
     return this;
 }

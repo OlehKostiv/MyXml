@@ -105,11 +105,11 @@ void PrintTree(const Node& node)
     std::cout << ptr << std::endl;
     delete[] ptr;
     
-    Node* child = node.FirstChild();
+    Node::Iter child = node.FirstChild();
     if (child)
         PrintTree(*child);
     
-    Node* sibling = node.NextSibling();
+    Node::Iter sibling = node.NextSibling();
     if (sibling)
         PrintTree(*sibling);
 }

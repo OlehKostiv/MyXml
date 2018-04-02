@@ -9,8 +9,7 @@
 static Logger Log(std::cout);
 #else 
 #include <fstream>
-static char* fp = __FILE__;
-static char* filePath = MyXml::AllocateACatOf(fp, ".txt");
+static char* filePath = MyXml::AllocateACatOf((char*)__FILE__, ".txt");
 static std::ofstream logFile(filePath, std::ios::out);
 static Logger Log(logFile);
 static int freeFP = []() { delete[] filePath; return 0;}();
