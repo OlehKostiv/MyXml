@@ -4,25 +4,28 @@
 
 #include <cstring>
 #include <cassert>
+#include <iostream>
 
 #ifdef _DEBUG
 static Logger Log(std::cout);
 #else 
 #include <fstream>
-static char filePath[] = __FILE__ ".txt";
+static char* fp = __FILE__;
+static char* filePath = MyXml::AllocateACatOf(fp, ".txt");
 static std::ofstream logFile(filePath, std::ios::out);
 static Logger Log(logFile);
+static int freeFP = []() { delete[] filePath; return 0;}();
 #endif
+
+
 
 MyXml::Node::Node() :
 	nextSister		(nullptr),
 	firstChild		(nullptr),
 	name			(nullptr),
 	text			(nullptr)
-{
-	Log.InRed("Node();");
-}
-MyXml::Node::Node(const Char * nodeName)
+{}
+MyXml::Node::Node(const Char* nodeName)
 {
     name = AllocateCopyOf(nodeName);
 }
@@ -36,50 +39,75 @@ MyXml::Node::Node(const Char* nodeName, PropertyChain& nodeProperties):
 {
     properties = static_cast<PropertyChain&&>(nodeProperties);
 }
-MyXml::Node::Node(const Char * nodeName, const Char * nodeText, PropertyChain& nodeProperties):
+MyXml::Node::Node(const Char* nodeName, const Char* nodeText, PropertyChain& nodeProperties):
     Node(nodeName, nodeText)
 {
     properties = static_cast<PropertyChain&&>(nodeProperties);
 }
 MyXml::Node::~Node()
 {
+    Log.InRed("~Node();");
+
 	if (name)
 		delete[] name;
 	if (text)
 		delete[] text;
-
-    Log.InRed("~Node();");
 }
 
-MyXml::Node& MyXml::Node::AppendChild(Node* newChild)
+MyXml::Node* MyXml::Node::AppendChild(Node* newChild)
 {
-    assert(newChild != nullptr);
+    //std::cout << this << " " << this->name << " ap c " << newChild->name << std::endl;  
+    if(!newChild->nextSister)
+        newChild->nextSister = this->firstChild;
+    else
+        newChild->AppendSibling(this->firstChild);
 
-    newChild->nextSister = this->firstChild;
     this->firstChild = newChild;
 
-    return *this;
+    return &(*this);
 }
-MyXml::Node& MyXml::Node::AppendSibling(Node* newSibling)
+MyXml::Node* MyXml::Node::AppendSibling(Node* newSibling)
 {
-    assert(newSibling != nullptr);
-
-    newSibling->nextSister = this->nextSister;
-    this->nextSister = newSibling;
-
-    return *this;
+    //std::cout << this << " " << this->name << " ap s " << newSibling->name << std::endl;
+    if (!this->nextSister)
+        this->nextSister = newSibling;
+    else
+    {
+        this->nextSister->AppendSibling(newSibling);
+    }
+    return &(*this);
 }
-MyXml::Char* MyXml::Node::ToPChar() const
+MyXml::Node* MyXml::Node::AppendProperty(Property* newProperty)
 {
-    Char buff[1024] = "";
-    
-    Char* props = properties.ToPChar();
-    std::sprintf(buff, "<%s %s", name, props);
-    delete[] props;
+    properties.Append(newProperty);
+    return this;
+}
+MyXml::Node* MyXml::Node::FirstChild() const
+{
+    return firstChild;
+}
+MyXml::Node* MyXml::Node::NextSibling() const
+{
+    return (nextSister);
+}
+MyXml::Char* MyXml::Node::ToCharStr() const
+{
+    Char buff[buffsizeHuge] = "";
+        
+    std::sprintf(buff, "<%s", name);
+
+    if (!properties.IsEmpty()) 
+    {
+        Char propBuff[buffsizeSmall] = " ";
+        Char* props = properties.ToCharStr();
+        std::strcat(propBuff, props);
+        delete[] props;
+        std::strcat(buff, propBuff);
+    }
 
     if (firstChild || text)
     {
-        std::strcat(buff, ">");
+        std::strcat(buff, ">\n");
         
         if (firstChild)
         {
@@ -88,37 +116,59 @@ MyXml::Char* MyXml::Node::ToPChar() const
         if (text)
         {
             std::strcat(buff, text);
+            std::strcat(buff, "\n");
         }
 
         Char* buffCat = buff;
         while (*++buffCat);
-        std::sprintf(buffCat, "</%s>", name);
+        std::sprintf(buffCat, "</%s>\n", name);
     }
     else
     {
-        std::strcat(buff, " />");
+        std::strcat(buff, "/>\n");
     }
     return AllocateCopyOf(buff);
 }
+MyXml::Node* MyXml::Node::operator->()
+{
+    return this;
+}
 
-MyXml::Element::Element(const Char * elementName, const Char * elementText):
+MyXml::Element::Element(const Char* elementName):
+    Node(elementName)
+{}
+MyXml::Element::Element(const Char* elementName, PropertyChain& elementProperties):
+    Node(elementName, elementProperties)
+{}
+MyXml::Element::Element(const Char* elementName, const Char* elementText):
     Node(elementName, elementText)
 {}
-MyXml::Element::Element(const Char * elementName, const Char * elementText, PropertyChain & elementProperties):
+MyXml::Element::Element(const Char* elementName, const Char* elementText, PropertyChain& elementProperties):
     Node(elementName, elementText, elementProperties)
 {}
 MyXml::Element::~Element()
 {
-    Log.InRed("~Element();");
+    Char buff[buffsizeSmall] = "~Element(): ";
+    if (name)
+        std::strcat(buff, name);
+    Log.InRed(buff);
 }
 
-MyXml::Comment::Comment(const Char * commentText):
-    Node()
+MyXml::Comment::Comment(const Char* commentText):
+    Element()
 {
     text = AllocateCopyOf(commentText);
 }
-
 MyXml::Comment::~Comment()
 {
-    Log.InRed("~Comment();");
+    Char buff[buffsizeSmall] = "~Comment();";
+    if (text)
+        std::strcat(buff, text);
+    Log.InRed(buff);
+}
+MyXml::Char* MyXml::Comment::ToCharStr() const
+{
+    Char buff[buffsizeHuge];
+    sprintf(buff, "<!--%s-->\n", text);
+    return AllocateCopyOf(buff);
 }

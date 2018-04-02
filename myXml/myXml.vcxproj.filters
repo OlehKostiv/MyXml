@@ -27,6 +27,9 @@
     <ClCompile Include="myCstrFunctional.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="myXmlTree.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="myXmlNode.h">
@@ -44,5 +47,11 @@
     <ClInclude Include="myCstrFunctional.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="myXmlTree.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="file.xml" />
   </ItemGroup>
 </Project>

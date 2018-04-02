@@ -13,7 +13,7 @@ namespace MyXml
         Property(const Char* propName, const Int propValue);
         ~Property();
 
-        Char* ToPChar() const;
+        Char* ToCharStr() const;
 
         Char* name = nullptr;
         Char* text = nullptr;
@@ -42,7 +42,7 @@ namespace MyXml
         PropertyChain(PropertyChain&& source);
         PropertyChain& operator = (PropertyChain&& source);
 
-        Char* ToPChar() const;
+        Char* ToCharStr() const;
 
        Bool IsEmpty() const;
        const Property::Iter FirstProperty() const;

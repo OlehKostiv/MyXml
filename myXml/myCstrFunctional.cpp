@@ -36,7 +36,7 @@ MyXml::Char* MyXml::AllocateACatOf(const Char* next, const Char* second)
     return result;
 }
 
-MyXml::Char* MyXml::IntToPChar(Int value)
+MyXml::Char* MyXml::IntToCharStr(Int value)
 {
     Char* result;
     if (value)
@@ -72,7 +72,7 @@ MyXml::Char* MyXml::IntToPChar(Int value)
     return result;
 }
 
-MyXml::Char* MyXml::DoubleToPChar(Double value)
+MyXml::Char* MyXml::DoubleToCharStr(Double value)
 {
     Int whole = (Int)value;
     Int part;
@@ -82,8 +82,8 @@ MyXml::Char* MyXml::DoubleToPChar(Double value)
             dPart *= 10;
         part = dPart;
     }
-    Char* w = IntToPChar(whole);
-    Char* p = IntToPChar(part);
+    Char* w = IntToCharStr(whole);
+    Char* p = IntToCharStr(part);
     p[0] = '.';
 
     Char* result = AllocateACatOf(w, p);

@@ -7,6 +7,6 @@ namespace MyXml
 {
     Char* AllocateCopyOf(const Char* source);
     Char* AllocateACatOf(const Char* first, const Char* second);
-    Char* IntToPChar(Int value);
-    Char* DoubleToPChar(Double value);
+    Char* IntToCharStr(Int value);
+    Char* DoubleToCharStr(Double value);
 }

@@ -9,9 +9,11 @@
 static Logger Log(std::cout);
 #else 
 #include <fstream>
-static char filePath[] = __FILE__ ".txt";
+static char* fp = __FILE__;
+static char* filePath = MyXml::AllocateACatOf(fp, ".txt");
 static std::ofstream logFile(filePath, std::ios::out);
 static Logger Log(logFile);
+static int freeFP = []() { delete[] filePath; return 0;}();
 #endif
 
 MyXml::PropertyChain& MyXml::PropertyChain::Append(Property* prp)
@@ -47,18 +49,20 @@ MyXml::PropertyChain& MyXml::PropertyChain::operator=(PropertyChain && source)
     source.firstProperty = nullptr;
     return *this;
 }
-MyXml::Char* MyXml::PropertyChain::ToPChar() const
+
+MyXml::Char* MyXml::PropertyChain::ToCharStr() const
 {
-    Char buff[1024] = "";
+    Char buff[buffsizeHuge] = "";
     for (Property::Iter it = firstProperty; it; it = it->next)
     {
-        Char* ptr = it->ToPChar();
+        Char* ptr = it->ToCharStr();
         std::strcat(buff, ptr);
         if (it->next)
             std::strcat(buff, " ");
     }
     return AllocateCopyOf(buff);
 }
+
 MyXml::Bool MyXml::PropertyChain::IsEmpty() const
 {
     return firstProperty == nullptr;
@@ -75,25 +79,26 @@ MyXml::Property::Property(const Char* propName, const Char* propValue)
 MyXml::Property::Property(const Char* propName, const Double propValue)
 {
     name = AllocateCopyOf(propName);
-    text = DoubleToPChar(propValue);
+    text = DoubleToCharStr(propValue);
 }
 MyXml::Property::Property(const Char* propName, Int propValue)
 {
     name = AllocateCopyOf(propName);
-    text = IntToPChar(propValue);
+    text = IntToCharStr(propValue);
 }
 MyXml::Property::~Property()
 {
     //Log.InRed("~Property();: ", " ").InRed(name, ", ").InRed(text);
     delete[] name;
     delete[] text;
+    Log.InRed("~Property();");
 }
 
-MyXml::Char* MyXml::Property::ToPChar() const
+MyXml::Char* MyXml::Property::ToCharStr() const
 {
-    Char buff[128];
+    Char buff[buffsizeSmall];
 
-    std::sprintf(buff, "%s = \"%s\"", name, text);
+    std::sprintf(buff, "%s=\"%s\"", name, text);
 
     return AllocateCopyOf(buff);
 }
