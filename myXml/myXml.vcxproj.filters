@@ -30,6 +30,9 @@
     <ClCompile Include="myXmlTree.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="myXmlDocument.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="myXmlNode.h">
@@ -48,6 +51,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="myXmlTree.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="myXmlDocument.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

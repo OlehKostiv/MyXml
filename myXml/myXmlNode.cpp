@@ -23,7 +23,8 @@ MyXml::Node::Node() :
 	name			(nullptr),
 	text			(nullptr)
 {}
-MyXml::Node::Node(const Char* nodeName)
+MyXml::Node::Node(const Char* nodeName):
+    Node()
 {
     name = AllocateCopyOf(nodeName);
 }
@@ -42,6 +43,18 @@ MyXml::Node::Node(const Char* nodeName, const Char* nodeText, PropertyChain& nod
 {
     properties = static_cast<PropertyChain&&>(nodeProperties);
 }
+MyXml::Node::Node(Node && source):
+    name(source.name),
+    text(source.text),
+    firstChild(source.firstChild),
+    nextSister(source.nextSister),
+    properties(static_cast<PropertyChain&&>(source.properties))
+
+{
+    source.name = source.text = nullptr;
+    source.firstChild = source.nextSister = nullptr;
+    Log.InRed("->Node();");
+}
 MyXml::Node::~Node()
 {
     Log.InRed("~Node();");
@@ -52,33 +65,45 @@ MyXml::Node::~Node()
 		delete[] text;
 }
 
-MyXml::Node::Iter MyXml::Node::AppendChild(Node::Iter newChild)
+MyXml::Node::Iter MyXml::Node::AppendChildrenPtr(Node::Iter newChild)
 {
     //std::cout << this << " " << this->name << " ap c " << newChild->name << std::endl;  
     if(!newChild->nextSister)
         newChild->nextSister = this->firstChild;
     else
-        newChild->AppendSibling(this->firstChild);
+        newChild->AppendSiblingsPtr(this->firstChild);
 
     this->firstChild = newChild;
 
     return &(*this);
 }
-MyXml::Node::Iter MyXml::Node::AppendSibling(Node::Iter newSibling)
+MyXml::Node::Iter MyXml::Node::AppendSiblingsPtr(Node::Iter newSibling)
 {
     //std::cout << this << " " << this->name << " ap s " << newSibling->name << std::endl;
     if (!this->nextSister)
         this->nextSister = newSibling;
     else
     {
-        this->nextSister->AppendSibling(newSibling);
+        this->nextSister->AppendSiblingsPtr(newSibling);
     }
     return &(*this);
 }
-MyXml::Node::Iter MyXml::Node::AppendProperty(Property* newProperty)
+MyXml::Node::Iter MyXml::Node::AppendPropertiesPtr(Property* newProperty)
 {
     properties.Append(newProperty);
     return this;
+}
+MyXml::Node& MyXml::Node::AppendChildren(Node& source)
+{
+    return static_cast<Node&>(*AppendChildrenPtr(new Node(static_cast<Node&&>(source))));
+}
+MyXml::Node& MyXml::Node::AppendSiblings(Node& source)
+{
+    return static_cast<Node&>(*AppendSiblingsPtr(new Node(static_cast<Node&&>(source))));
+}
+MyXml::Node& MyXml::Node::AppendProperties(Property& source)
+{
+    return static_cast<Node&>(*AppendPropertiesPtr(new Property(static_cast<Property&&>(source))));
 }
 MyXml::Node::Iter MyXml::Node::FirstChild() const
 {
@@ -87,6 +112,18 @@ MyXml::Node::Iter MyXml::Node::FirstChild() const
 MyXml::Node::Iter MyXml::Node::NextSibling() const
 {
     return nextSister;
+}
+const MyXml::Char* MyXml::Node::Name() const
+{
+    return const_cast<const Char*>(name);
+}
+const MyXml::Char* MyXml::Node::Value() const
+{
+    return const_cast<const Char*>(text);
+}
+const MyXml::PropertyChain& MyXml::Node::Properties() const
+{
+    return const_cast<const PropertyChain&>(properties);
 }
 MyXml::Char* MyXml::Node::ToCharStr() const
 {
@@ -144,6 +181,9 @@ MyXml::Element::Element(const Char* elementName, const Char* elementText):
 MyXml::Element::Element(const Char* elementName, const Char* elementText, PropertyChain& elementProperties):
     Node(elementName, elementText, elementProperties)
 {}
+MyXml::Element::Element(Element&& source):
+    Node(std::move(static_cast<Node&>(source)))
+{}
 MyXml::Element::~Element()
 {
     Char buff[buffsizeSmall] = "~Element(): ";
@@ -157,6 +197,9 @@ MyXml::Comment::Comment(const Char* commentText):
 {
     text = AllocateCopyOf(commentText);
 }
+MyXml::Comment::Comment(Comment && source):
+    Element(static_cast<Element&&>(source))
+{}
 MyXml::Comment::~Comment()
 {
     Char buff[buffsizeSmall] = "~Comment();";
@@ -168,5 +211,29 @@ MyXml::Char* MyXml::Comment::ToCharStr() const
 {
     Char buff[buffsizeHuge];
     sprintf(buff, "<!--%s-->\n", text);
+    return AllocateCopyOf(buff);
+}
+
+MyXml::Comment::operator Node && ()
+{
+    return dynamic_cast<Node&&>(*this);
+}
+
+MyXml::Declaration::Declaration():
+    Declaration(static_cast<PropertyChain&>(PropertyChain(new Property("version", 1.0), new Property("encoding", "ascii"), new Property("standalone", "yes"))))
+{}
+MyXml::Declaration::Declaration(Declaration && source):
+    Element(static_cast<Element&&>(source))
+{}
+MyXml::Declaration::Declaration(PropertyChain& declarationPropeties):
+    Element("xml", static_cast<PropertyChain&>(declarationPropeties))
+{}
+MyXml::Char* MyXml::Declaration::ToCharStr() const
+{
+    Char buff[buffsizeSmall] = "";
+    Char* ptr = properties.ToCharStr();
+    sprintf(buff, "<?xml %s ?>", ptr);
+    delete[] ptr;
+
     return AllocateCopyOf(buff);
 }

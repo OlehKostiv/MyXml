@@ -18,6 +18,7 @@ using namespace MyXml;
 #include "PropertyChain.h"
 #include "myXmlNode.h"
 #include "myXmlTree.h"
+#include "myXmlDocument.h"
 
 void TestAllocateCopyOf()
 {
@@ -114,80 +115,90 @@ void PrintTree(const Node& node)
         PrintTree(*sibling);
 }
 
-void TestNode()
+//void TestNode()
+//{
+//    Tree root("root");
+//
+//    root->AppendChildren(
+//        new Element("el1", 
+//                    PropertyChain(new Property("first_name", "Poop"), 
+//                                  new Property("last_name", "Amen")
+//                    )
+//        )
+//    );
+//    root->AppendChildren(new Element("el2", "this is element 2"));
+//
+//    Node& rootChild = *(root.FirstChild());
+//
+//    rootChild->AppendProperties(new Property("taste", "awful")); 
+//    rootChild->AppendProperties(new Property("color", "black"));
+//
+//    rootChild->AppendChildren(new Comment("this is my comment"), (new Element("element"))->AppendProperties(new Property("elp", 0)));
+//
+//    rootChild->AppendChildren((new Element("e2"))->AppendProperties(new Property("elp", 1), new Property("elp",2)), new Element("e3"));
+//
+//    root->AppendChildren
+//    (
+//        (new Element("exp"))
+//        ->AppendSiblings
+//        (
+//            (new Element("exp_sibling"))
+//            ->AppendChildren
+//            (
+//                new Element("exp_sibling_child1"),
+//                new Element("exp_Sibling_child2")
+//            )
+//            ->AppendSiblings
+//            (
+//                new Element("exp_sibling_sibling1"),
+//                new Element("exp_sibling_sibling1")
+//            )
+//        )
+//        ->AppendSiblings
+//        (
+//            new Element("exp_sibling_2", "exp_sibling_text")
+//        )
+//    );
+//
+//    Comment c("this is comment");
+//    //c.AppendChildren(new Element("asd"));
+//
+//        //->AppendProperties(new Property("exp_prop", "exp_prop_value"))
+//        //
+//        //->AppendChildren(
+//        //    (new Element("exp_chind"))
+//        //    ->AppendChildren(
+//        //         new Element("exp_chind2")
+//        //    )
+//        //    //->AppendProperties(new Property("exp_chilp_prop", 0))
+//        //    //->AppendChildren(new Element("exp_child_child"))
+//        //)
+//        //->AppendChildren(
+//        //(new Element("exp_chind2"))
+//        //->AppendProperties(new Property("exp_chilp_prop", 0))
+//        //->AppendChildren(new Element("exp_child_child"))
+//    //)
+//
+//    //root->FirstChild()->AppendSiblings(new Element("sib_2"));
+//    //root->FirstChild()->AppendSiblings(new Element("exp_sibling", "exp_sibling_text"));
+//
+//   // PrintTree(root);
+//    Char* ptr = root.AsCharStr();
+//    std::ofstream file("file.xml", std::ios::out);
+//    file << ptr << std::endl;
+//    file.close();
+//    delete[] ptr;
+//}
+void TestDocument() 
 {
-    Tree root("root");
+    Document doc("myDoc.xml", Tree("root"), Declaration(PropertyChain(Property("ver", 2.0))));
 
-    root->AppendChild(
-        new Element("el1", 
-                    PropertyChain(new Property("first_name", "Poop"), 
-                                  new Property("last_name", "Amen")
-                    )
-        )
-    );
-    root->AppendChild(new Element("el2", "this is element 2"));
+    doc.Root().AppendChildren(Element("e1").AppendProperties(Property("p1",1)), Element("e2"));
+    doc.Root().AppendChildren(Element("e2").AppendProperties(Property("p21", 21), Property("p22", 22)).AppendSiblings(Element("e3")));
 
-    Node& rootChild = *(root.FirstChild());
-
-    rootChild->AppendProperty(new Property("taste", "awful")); 
-    rootChild->AppendProperty(new Property("color", "black"));
-
-    rootChild->AppendChild(new Comment("this is my comment"), (new Element("element"))->AppendProperty(new Property("elp", 0)));
-
-    rootChild->AppendChild((new Element("e2"))->AppendProperty(new Property("elp", 1), new Property("elp",2)), new Element("e3"));
-
-    root->AppendChild
-    (
-        (new Element("exp"))
-        ->AppendSibling
-        (
-            (new Element("exp_sibling"))
-            ->AppendChild
-            (
-                new Element("exp_sibling_child1"),
-                new Element("exp_Sibling_child2")
-            )
-            ->AppendSibling
-            (
-                new Element("exp_sibling_sibling1"),
-                new Element("exp_sibling_sibling1")
-            )
-        )
-        ->AppendSibling
-        (
-            new Element("exp_sibling_2", "exp_sibling_text")
-        )
-    );
-
-    Comment c("this is comment");
-    //c.AppendChild(new Element("asd"));
-
-        //->AppendProperty(new Property("exp_prop", "exp_prop_value"))
-        //
-        //->AppendChild(
-        //    (new Element("exp_chind"))
-        //    ->AppendChild(
-        //         new Element("exp_chind2")
-        //    )
-        //    //->AppendProperty(new Property("exp_chilp_prop", 0))
-        //    //->AppendChild(new Element("exp_child_child"))
-        //)
-        //->AppendChild(
-        //(new Element("exp_chind2"))
-        //->AppendProperty(new Property("exp_chilp_prop", 0))
-        //->AppendChild(new Element("exp_child_child"))
-    //)
-
-    //root->FirstChild()->AppendSibling(new Element("sib_2"));
-    //root->FirstChild()->AppendSibling(new Element("exp_sibling", "exp_sibling_text"));
-
-   // PrintTree(root);
-    Char* ptr = root.AsCharStr();
-    std::ofstream file("file.xml", std::ios::out);
-    file << ptr << std::endl;
-    file.close();
-    delete[] ptr;
+    std::cout << doc.ToCharStr() << std::endl;
 }
+
 
 int main()
 {
@@ -197,7 +208,8 @@ int main()
     //TestDoubleToPchar();
     //TestPropertyToPchar();
     //TestPropertyChain();
-    TestNode();
+    //TestNode();
+    TestDocument();
 
     return system("pause");
 }

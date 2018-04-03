@@ -121,11 +121,13 @@
   <ItemGroup>
     <ClCompile Include="mainOfMyXml.cpp" />
     <ClCompile Include="myCstrFunctional.cpp" />
+    <ClCompile Include="myXmlDocument.cpp" />
     <ClCompile Include="myXmlNode.cpp" />
     <ClCompile Include="myXmlTree.cpp" />
     <ClCompile Include="PropertyChain.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="myXmlDocument.h" />
     <ClInclude Include="myCstrFunctional.h" />
     <ClInclude Include="Logger.h" />
     <ClInclude Include="myXmlNode.h" />

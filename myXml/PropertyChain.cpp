@@ -24,7 +24,12 @@ MyXml::PropertyChain& MyXml::PropertyChain::Append(Property* prp)
 
     return *this;
 }
-MyXml::PropertyChain::PropertyChain(Property *p)
+MyXml::PropertyChain & MyXml::PropertyChain::Append(Property&& source)
+{
+    return Append(new Property(static_cast<Property&&>(source)));
+}
+MyXml::PropertyChain::PropertyChain(Property *p):
+    PropertyChain()
 {
     Append(p);
 }
@@ -37,6 +42,12 @@ MyXml::PropertyChain::~PropertyChain()
         delete killer;
     }
 }
+MyXml::PropertyChain::PropertyChain():
+    firstProperty(nullptr)
+{}
+MyXml::PropertyChain::PropertyChain(Property&& rr):
+    PropertyChain(new Property(static_cast<Property&&>(rr)))
+{}
 MyXml::PropertyChain::PropertyChain(PropertyChain&& source)
 {
     firstProperty = source.firstProperty;
@@ -85,11 +96,22 @@ MyXml::Property::Property(const Char* propName, Int propValue)
     name = AllocateCopyOf(propName);
     text = IntToCharStr(propValue);
 }
+MyXml::Property::Property(Property&& source)
+{
+    name = source.name;
+    text = source.text;
+    next = source.next;
+
+    source.name = nullptr;
+    source.text = nullptr;
+    source.next = nullptr;
+}
 MyXml::Property::~Property()
 {
-    //Log.InRed("~Property();: ", " ").InRed(name, ", ").InRed(text);
-    delete[] name;
-    delete[] text;
+    if (name)
+        delete[] name;
+    if (text)
+        delete[] text;
     Log.InRed("~Property();");
 }
 

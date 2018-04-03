@@ -11,6 +11,7 @@ namespace MyXml
         Property(const Char* propName, const Char* propValue);
         Property(const Char* propName, const Double propValue);
         Property(const Char* propName, const Int propValue);
+        Property(Property&&);
         ~Property();
 
         Char* ToCharStr() const;
@@ -23,19 +24,31 @@ namespace MyXml
 	class PropertyChain
 	{
 	public:
-        PropertyChain & Append(Property*);
+        PropertyChain& Append(Property*);
+        PropertyChain& Append(Property&&);
         template <class...Args>
         PropertyChain& Append(Property* p, Args...args) // appends backwards
         {
             return Append(p).Append(args...);
         }
-
+        template <class...Args>
+        PropertyChain& Append(Property&& p, Args...args) // appends backwards
+        {
+            return Append(p).Append(args...);
+        }
+       
        ~PropertyChain();
-        PropertyChain() = default;
+        PropertyChain();
         PropertyChain(Property*);
+        PropertyChain(Property&& rvalProp);
         template <class...Args>
         PropertyChain(Property* p, Args...args)
         {            
+            Append(p, args...);
+        }
+        template <class...Args>
+        PropertyChain(Property&& p, Args...args)
+        {
             Append(p, args...);
         }
 
@@ -47,6 +60,6 @@ namespace MyXml
        Bool IsEmpty() const;
        const Property::Iter FirstProperty() const;
 	protected:
-		Property::Iter firstProperty = nullptr;
+		Property::Iter firstProperty;
 	};
 }

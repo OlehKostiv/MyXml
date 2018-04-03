@@ -1,11 +1,13 @@
 #include "myXmlTree.h"
 #include "myCstrFunctional.h"
 
-MyXml::Tree::Tree():
-    Tree("theUgliestDefaultRootNameEver")
+MyXml::Tree::Tree()
 {}
 MyXml::Tree::Tree(const Char * rootName):
     Element(rootName)
+{}
+MyXml::Tree::Tree(Tree && source):
+    Element(static_cast<Element&&>(source))
 {}
 MyXml::Tree::~Tree()
 {

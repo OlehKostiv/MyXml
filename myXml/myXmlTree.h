@@ -9,13 +9,16 @@ namespace MyXml
         public Element
     {
     public:
+        using Iter = Tree*;
         Tree();
         Tree(const Char* rootName);
+        Tree(Tree&&);
        ~Tree();
         Char* AsCharStr() const;
     protected:
         using Element::ToCharStr;
         static Char* RecursiveSelfCharStrCast(Node::SuperConstIter root);
         static void RecursiveSelfDestruction(Node::ConstIter root);
+        friend class Document;
     };
 }

@@ -1,7 +1,0 @@
-~Property();
-~Property();
-~Property();
-~Property();
-~Property();
-~Property();
-~Property();
